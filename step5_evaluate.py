@@ -7,15 +7,11 @@ from sklearn.metrics import (
     recall_score, f1_score,
     classification_report, confusion_matrix
 )
-from sklearn.datasets import fetch_lfw_people
-from sklearn.model_selection import train_test_split
 
-# ── Tải lại dữ liệu (cần names và X_test) ──────────────
-lfw   = fetch_lfw_people(min_faces_per_person=50, resize=0.5, color=False)
-names = lfw.target_names
-_, X_test, _, y_test = train_test_split(
-    lfw.images, lfw.target, test_size=0.25, random_state=42, stratify=lfw.target
-)
+# ── Load dữ liệu đã lưu từ step1 (không cần fetch lại) ──────────────
+X_test = np.load('output/X_test.npy')
+y_test = np.load('output/y_test.npy')
+names  = np.load('output/names.npy', allow_pickle=True)
 
 # ── Load model và features đã lưu ──────────────────────
 best_model = joblib.load('output/svm_model.pkl')
@@ -30,17 +26,10 @@ y_pred = best_model.predict(X_test_scaled)
 #  CÁC CHỈ SỐ ĐÁNH GIÁ (theo bài giảng Phụ lục 1)
 # ════════════════════════════════════════════════════════
 
-# 1. ACCURACY — Độ đúng tổng thể
-acc = accuracy_score(y_test, y_pred)
-
-# 2. PRECISION — Độ chính xác (macro: trung bình đều các lớp)
+acc  = accuracy_score(y_test, y_pred)
 prec = precision_score(y_test, y_pred, average='macro', zero_division=0)
-
-# 3. RECALL — Độ truy hồi
-rec = recall_score(y_test, y_pred, average='macro', zero_division=0)
-
-# 4. F1-SCORE — Trung bình điều hòa Precision và Recall
-f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
+rec  = recall_score(y_test, y_pred, average='macro', zero_division=0)
+f1   = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
 print("=" * 55)
 print("  KẾT QUẢ ĐÁNH GIÁ MÔ HÌNH (Hold-out 75/25)")
@@ -56,24 +45,18 @@ print("\nBÁO CÁO CHI TIẾT TỪNG LỚP:")
 print(classification_report(y_test, y_pred, target_names=names))
 
 # ════════════════════════════════════════════════════════
-#  CONFUSION MATRIX
+#  CONFUSION MATRIX + VISUALIZE
 # ════════════════════════════════════════════════════════
 cm = confusion_matrix(y_test, y_pred)
 
 plt.figure(figsize=(14, 11))
-sns.heatmap(
-    cm,
-    annot=True, fmt='d', cmap='Blues',
-    xticklabels=names, yticklabels=names
-)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+            xticklabels=names, yticklabels=names)
 plt.xlabel('Dự đoán (Predicted)', fontsize=12)
 plt.ylabel('Thực tế (Actual)', fontsize=12)
-plt.title(
-    f'Confusion Matrix — Gabor Wavelets + SVM\n'
-    f'Accuracy={acc*100:.1f}%  Precision={prec*100:.1f}%  '
-    f'Recall={rec*100:.1f}%  F1={f1*100:.1f}%',
-    fontsize=12
-)
+plt.title(f'Confusion Matrix — Gabor Wavelets + SVM\n'
+          f'Accuracy={acc*100:.1f}%  F1={f1*100:.1f}%',
+          fontsize=12)
 plt.xticks(rotation=45, ha='right', fontsize=8)
 plt.yticks(fontsize=8)
 plt.tight_layout()
@@ -81,14 +64,12 @@ plt.savefig('output/confusion_matrix.png', dpi=150, bbox_inches='tight')
 plt.show()
 print("Đã lưu: output/confusion_matrix.png")
 
-# ════════════════════════════════════════════════════════
-#  VISUALIZE KẾT QUẢ DỰ ĐOÁN (đúng=xanh, sai=đỏ)
-# ════════════════════════════════════════════════════════
+# Visualize kết quả dự đoán
 fig, axes = plt.subplots(3, 6, figsize=(18, 9))
 for i, ax in enumerate(axes.flat):
     ax.imshow(X_test[i], cmap='gray')
-    pred_name = names[y_pred[i]].split()[-1]
-    true_name = names[y_test[i]].split()[-1]
+    pred_name = names[y_pred[i]]
+    true_name = names[y_test[i]]
     correct   = y_pred[i] == y_test[i]
     ax.set_title(
         f"{'OK' if correct else 'SAI'}\nPred: {pred_name}\nTrue: {true_name}",

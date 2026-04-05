@@ -1,35 +1,30 @@
-from sklearn.datasets import fetch_lfw_people
+from sklearn.datasets import fetch_olivetti_faces
 from sklearn.model_selection import train_test_split
 import numpy as np, matplotlib.pyplot as plt, os
 
 os.makedirs('output', exist_ok=True)
 
-# ── Tải LFW dataset ──────────────────────────────────
-print("Đang tải dataset LFW...")
-lfw = fetch_lfw_people(
-    min_faces_per_person=50,  # Người có >= 50 ảnh
-    resize=0.5,               # Ảnh 62x47 pixel
-    color=False               # Ảnh xám
-)
+# ── Tải Olivetti Faces dataset ──────────────────────────────────
+print("Đang tải dataset Olivetti Faces...")
+data = fetch_olivetti_faces(shuffle=True, random_state=42)
 
-X     = lfw.images        # (n_samples, 62, 47)
-y     = lfw.target        # (n_samples,)
-names = lfw.target_names  # Tên từng người
+X     = data.images        # (400, 64, 64) - ảnh xám sẵn
+y     = data.target        # (400,)
+names = np.array([f"Person_{i:02d}" for i in range(40)])
 
 print(f"Số người  : {len(names)}")
 print(f"Tổng ảnh  : {X.shape[0]}")
 print(f"Kích thước: {X.shape[1]} x {X.shape[2]}")
 print()
 for i, name in enumerate(names):
-    print(f"  {name}: {(y==i).sum()} ảnh")
+    print(f"  {name}: {(y==i).sum()} ảnh")   # → mỗi người đúng 10 ảnh
 
 # ── Hold-out 75/25 + Stratified sampling ─────────────
-# (Chia dataset thành 2 phần Train - Test)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
-    test_size=0.25,    # 25% test, 75% train
+    test_size=0.25,
     random_state=42,
-    stratify=y         # Stratified: tỉ lệ lớp đều nhau
+    stratify=y
 )
 
 print(f"Train : {X_train.shape[0]} ảnh (75%)")
@@ -47,9 +42,9 @@ print("Đã lưu: output/X_train.npy, X_test.npy, ...")
 fig, axes = plt.subplots(2, 6, figsize=(15,5))
 for i, ax in enumerate(axes.flat):
     ax.imshow(X_train[i], cmap='gray')
-    ax.set_title(names[y_train[i]].split()[-1], fontsize=8)
+    ax.set_title(names[y_train[i]], fontsize=8)
     ax.axis('off')
-plt.suptitle('Mẫu ảnh dataset LFW', fontsize=12)
+plt.suptitle('Mẫu ảnh dataset Olivetti Faces', fontsize=12)
 plt.tight_layout()
 plt.savefig('output/sample_images.png', dpi=100)
 plt.show()
