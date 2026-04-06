@@ -5,22 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e908e9b9-ed46-4717-8bfa-7fcdf000a7fc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/demo_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/X_test.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/X_test.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/X_train.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/X_train.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/confusion_matrix.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/confusion_matrix.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/features_test.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/features_test.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/features_train.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/features_train.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/names.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/names.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/predictions.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/predictions.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/sample_images.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/sample_images.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/scaler.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/output/scaler.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/svm_model.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/output/svm_model.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/y_test.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/y_test.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/y_train.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/y_train.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/step1_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/step1_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/step5_evaluate.py" beforeDir="false" afterPath="$PROJECT_DIR$/step5_evaluate.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo_test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,18 +23,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "HaiTrieu186"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;HaiTrieu186&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "git@github.com:HaiTrieu186/KhaiPhaDuLieuDaPhuongTien_MUL14130_GaborSVM_N22DCPT103_N22DCPT104.git",
-    "accountId": "51ec5e02-1058-45ec-a82e-e9252b920f79"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:HaiTrieu186/KhaiPhaDuLieuDaPhuongTien_MUL14130_GaborSVM_N22DCPT103_N22DCPT104.git&quot;,
+    &quot;accountId&quot;: &quot;51ec5e02-1058-45ec-a82e-e9252b920f79&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -57,21 +43,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.demo_test.executor": "Run",
-    "Python.step1_data.executor": "Run",
-    "Python.step2_gabor.executor": "Run",
-    "Python.step3_features.executor": "Run",
-    "Python.step4_train.executor": "Run",
-    "Python.step5_evaluate.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.demo_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.step1_data.executor&quot;: &quot;Run&quot;,
+    &quot;Python.step2_gabor.executor&quot;: &quot;Run&quot;,
+    &quot;Python.step3_features.executor&quot;: &quot;Run&quot;,
+    &quot;Python.step4_train.executor&quot;: &quot;Run&quot;,
+    &quot;Python.step5_evaluate.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

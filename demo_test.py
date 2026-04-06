@@ -1,14 +1,14 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 import numpy as np
 import joblib
 import cv2
 from PIL import Image, ImageTk
+import matplotlib.pyplot as plt
 from step2_gabor import build_gabor_bank
 from step3_features import extract_gabor_features
 
 # ====================== LOAD DỮ LIỆU ======================
-print("Đang load model và test set...")
 model = joblib.load('output/svm_model.pkl')
 scaler = joblib.load('output/scaler.pkl')
 gabor_bank = build_gabor_bank()
@@ -16,106 +16,160 @@ X_test = np.load('output/X_test.npy')
 y_test = np.load('output/y_test.npy')
 names = np.load('output/names.npy', allow_pickle=True)
 
-# Nhóm ảnh theo Person (từ test set)
 from collections import defaultdict
 
 groups = defaultdict(list)
 for i, label in enumerate(y_test):
     groups[names[label]].append(i)
 
-# Chuẩn bị danh sách Person
 person_list = sorted(groups.keys())
 
 # ====================== UI ======================
 root = tk.Tk()
-root.title("Demo Nhận Dạng Khuôn Mặt - Gabor + SVM")
-root.geometry("1000x700")
-root.configure(bg="#f0f0f0")
+root.title("Demo Nhận Dạng Khuôn Mặt - Gabor Wavelets + SVM")
+root.geometry("1180x720")
+root.configure(bg="#f8f9fa")
+root.resizable(False, False)
 
-tk.Label(root, text="🎯 DEMO NHẬN DẠNG KHUÔN MẶT", font=("Arial", 18, "bold"), bg="#f0f0f0").pack(pady=10)
+tk.Label(root, text="NHẬN DẠNG KHUÔN MẶT",
+         font=("Arial", 22, "bold"), bg="#f8f9fa", fg="#1a73e8").pack(pady=(20, 5))
+tk.Label(root, text="Gabor Wavelets + Support Vector Machine",
+         font=("Arial", 11), bg="#f8f9fa", fg="#555555").pack(pady=(0, 15))
 
-# Combobox chọn Person
-tk.Label(root, text="Chọn người:", font=("Arial", 12), bg="#f0f0f0").pack()
-combo_person = ttk.Combobox(root, values=person_list, state="readonly", font=("Arial", 11), width=30)
-combo_person.pack(pady=5)
+main_frame = tk.Frame(root, bg="#f8f9fa")
+main_frame.pack(padx=30, pady=10, fill="both", expand=True)
 
-# Frame chứa 3 ảnh
-frame_images = tk.Frame(root, bg="#f0f0f0")
-frame_images.pack(pady=15)
+# Left panel
+left = tk.LabelFrame(main_frame, text=" Chọn người và ảnh test ",
+                     font=("Arial", 12, "bold"), bg="#f8f9fa", fg="#1a73e8", padx=15, pady=15)
+left.pack(side="left", fill="y", padx=(0, 20))
 
-photo_labels = []
-buttons = []
+tk.Label(left, text="Người:", font=("Arial", 11), bg="#f8f9fa").pack(anchor="w")
+combo = ttk.Combobox(left, values=person_list, state="readonly", font=("Arial", 11), width=28)
+combo.pack(pady=(8, 15), anchor="w")
+
+thumb_frame = tk.Frame(left, bg="#f8f9fa")
+thumb_frame.pack()
+
+photo_refs = []
+btn_refs = []
 
 
-def show_person_images(event=None):
-    for widget in frame_images.winfo_children():
-        widget.destroy()
+def update_thumbnails(*args):
+    for w in thumb_frame.winfo_children():
+        w.destroy()
+    photo_refs.clear()
+    btn_refs.clear()
 
-    person = combo_person.get()
+    person = combo.get()
     if not person:
         return
-
-    indices = groups[person][:3]  # tối đa 3 ảnh
-
-    global photo_labels, buttons
-    photo_labels = []
-    buttons = []
+    indices = groups[person][:3]
 
     for order, idx in enumerate(indices, 1):
-        # Tạo thumbnail
-        img_array = (X_test[idx] * 255).astype(np.uint8)
-        img_pil = Image.fromarray(img_array).resize((200, 200))
-        photo = ImageTk.PhotoImage(img_pil)
+        arr = (X_test[idx] * 255).astype(np.uint8)
+        pil = Image.fromarray(arr).resize((170, 170))
+        photo = ImageTk.PhotoImage(pil)
 
-        # Label ảnh
-        lbl = tk.Label(frame_images, image=photo, relief="solid", bd=2)
-        lbl.image = photo  # giữ reference
+        lbl = tk.Label(thumb_frame, image=photo, relief="solid", bd=2, bg="white")
+        lbl.image = photo
         lbl.grid(row=0, column=order - 1, padx=10)
-        photo_labels.append(lbl)
+        photo_refs.append(lbl)
 
-        # Button test
-        btn = tk.Button(frame_images, text=f"Test ảnh {order}",
-                        font=("Arial", 10), bg="#4CAF50", fg="white",
-                        command=lambda i=idx, p=person: predict_image(i, p))
-        btn.grid(row=1, column=order - 1, pady=5)
-        buttons.append(btn)
+        # Nút Test
+        btn_test = tk.Button(thumb_frame, text=f"Test ảnh {order}", font=("Arial", 10, "bold"),
+                             bg="#1a73e8", fg="white", width=14, height=2,
+                             command=lambda i=idx, p=person: predict(i, p))
+        btn_test.grid(row=1, column=order - 1, pady=5)
+
+        # Nút Xem Gabor
+        btn_gabor = tk.Button(thumb_frame, text="Xem Gabor", font=("Arial", 9),
+                              bg="#4285f4", fg="white", width=14,
+                              command=lambda i=idx: show_gabor_process(i))
+        btn_gabor.grid(row=2, column=order - 1, pady=3)
 
 
-combo_person.bind("<<ComboboxSelected>>", show_person_images)
+combo.bind("<<ComboboxSelected>>", update_thumbnails)
+
+# Right panel
+right = tk.LabelFrame(main_frame, text=" Kết quả dự đoán ",
+                      font=("Arial", 12, "bold"), bg="#ffffff", fg="#1a73e8", padx=20, pady=20)
+right.pack(side="right", fill="both", expand=True)
+
+result_text = tk.Label(right, text="Chưa có kết quả\n\nChọn người và nhấn nút Test ảnh",
+                       font=("Arial", 12), bg="#ffffff", fg="#666666", justify="left")
+result_text.pack(pady=10)
+
+preview = tk.Label(right, bg="#f0f0f0", relief="solid", bd=3)
+preview.pack(pady=15)
 
 
-# ====================== HÀM DỰ ĐOÁN ======================
-def predict_image(img_idx, true_person):
+def reset():
+    combo.set('')
+    for w in thumb_frame.winfo_children():
+        w.destroy()
+    result_text.config(text="Chưa có kết quả\n\nChọn người và nhấn nút Test ảnh", fg="#666666")
+    preview.config(image='')
+
+
+tk.Button(root, text="Reset", font=("Arial", 10), bg="#f8f9fa", fg="#555555", command=reset).pack(side="bottom",
+                                                                                                  pady=15)
+
+
+# ====================== DỰ ĐOÁN ======================
+def predict(img_idx, true_person):
     img_array = X_test[img_idx]
-
-    # Trích đặc trưng
     features = extract_gabor_features(img_array, gabor_bank)
     features_scaled = scaler.transform([features])
-
-    # Dự đoán
     pred_idx = model.predict(features_scaled)[0]
     pred_name = names[pred_idx]
 
-    result = "✅ ĐÚNG" if pred_name == true_person else "❌ SAI"
+    is_correct = pred_name == true_person
+    color = "#34a853" if is_correct else "#ea4335"
+    status = "✅ ĐÚNG" if is_correct else "❌ SAI"
 
-    # Hiển thị popup kết quả
-    messagebox.showinfo(
-        "Kết quả dự đoán",
-        f"{result}\n\n"
-        f"Thực tế     : {true_person}\n"
-        f"Model đoán : {pred_name}\n\n"
-        f"Accuracy tổng thể: 91.00%"
+    result_text.config(
+        text=f"Thực tế          : {true_person}\n"
+             f"Mô hình dự đoán : {pred_name}\n\n"
+             f"{status}",
+        fg=color
     )
 
-    # Hiện ảnh lớn
-    display_img = (img_array * 255).astype(np.uint8)
-    cv2.imshow(f"{result} - {true_person}", display_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    display = (img_array * 255).astype(np.uint8)
+    pil_big = Image.fromarray(display).resize((340, 340))
+    photo_big = ImageTk.PhotoImage(pil_big)
+    preview.config(image=photo_big)
+    preview.image = photo_big
 
 
-# ====================== CHẠY UI ======================
-tk.Label(root, text="Chọn người → Chọn ảnh → Nhấn nút Test",
-         font=("Arial", 10), fg="gray", bg="#f0f0f0").pack(pady=5)
+# ====================== MINH HỌA GABOR ======================
+def show_gabor_process(img_idx):
+    img = (X_test[img_idx] * 255).astype(np.uint8)
+
+    # Lấy 8 bộ lọc tiêu biểu (scale 3 - tất cả hướng)
+    selected = [f for f in gabor_bank if f['scale'] == 3]
+
+    plt.figure(figsize=(14, 8))
+    plt.suptitle("Quá trình Gabor - Ảnh gốc → 8 bản đồ phản hồi (Scale 3)", fontsize=14, fontweight='bold')
+
+    # Ảnh gốc
+    plt.subplot(3, 3, 1)
+    plt.imshow(img, cmap='gray')
+    plt.title("Ảnh gốc", fontsize=11)
+    plt.axis('off')
+
+    # 8 response maps
+    for i, f in enumerate(selected):
+        filtered = cv2.filter2D(img, cv2.CV_64F, f['kernel'])
+        response = np.abs(filtered)
+
+        plt.subplot(3, 3, i + 2)
+        plt.imshow(response, cmap='jet')
+        plt.title(f"{f['theta_deg']}°", fontsize=10)
+        plt.axis('off')
+
+    plt.tight_layout()
+    plt.show(block=True)
+
 
 root.mainloop()
