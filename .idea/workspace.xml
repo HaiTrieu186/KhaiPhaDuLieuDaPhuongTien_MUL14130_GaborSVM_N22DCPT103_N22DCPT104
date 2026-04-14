@@ -6,7 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="e908e9b9-ed46-4717-8bfa-7fcdf000a7fc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/confusion_matrix.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/confusion_matrix.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/features_test.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/features_test.npy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/features_train.npy" beforeDir="false" afterPath="$PROJECT_DIR$/output/features_train.npy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/predictions.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/predictions.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/scaler.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/output/scaler.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/svm_model.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/output/svm_model.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/step3_features.py" beforeDir="false" afterPath="$PROJECT_DIR$/step3_features.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

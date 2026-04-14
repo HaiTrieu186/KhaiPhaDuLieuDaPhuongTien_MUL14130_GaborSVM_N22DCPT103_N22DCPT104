@@ -14,6 +14,7 @@ scaler = joblib.load('output/scaler.pkl')
 gabor_bank = build_gabor_bank()
 X_test = np.load('output/X_test.npy')
 y_test = np.load('output/y_test.npy')
+y_train = np.load('output/y_train.npy')
 names = np.load('output/names.npy', allow_pickle=True)
 
 from collections import defaultdict
@@ -33,11 +34,16 @@ root.resizable(False, False)
 
 tk.Label(root, text="NHẬN DẠNG KHUÔN MẶT",
          font=("Arial", 22, "bold"), bg="#f8f9fa", fg="#1a73e8").pack(pady=(20, 5))
-tk.Label(root, text="Gabor Wavelets + Support Vector Machine",
-         font=("Arial", 11), bg="#f8f9fa", fg="#555555").pack(pady=(0, 15))
+tk.Label(root, text="Local Gabor Wavelets (Block-based) + Support Vector Machine",
+         font=("Arial", 11), bg="#f8f9fa", fg="#555555").pack(pady=(0, 10))
+
+# Thanh thông tin Dataset
+info_str = f" Dataset Olivetti: {len(names)} Đối tượng   |   📥 Tập Train: {len(y_train)} ảnh   |   📤 Tập Test: {len(y_test)} ảnh"
+tk.Label(root, text=info_str, font=("Arial", 10, "bold"), bg="#e8f0fe", fg="#1a73e8", padx=20, pady=6,
+         relief="flat").pack(pady=(0, 15))
 
 main_frame = tk.Frame(root, bg="#f8f9fa")
-main_frame.pack(padx=30, pady=10, fill="both", expand=True)
+main_frame.pack(padx=30, pady=5, fill="both", expand=True)
 
 # Left panel
 left = tk.LabelFrame(main_frame, text=" Chọn người và ảnh test ",
@@ -119,6 +125,8 @@ tk.Button(root, text="Reset", font=("Arial", 10), bg="#f8f9fa", fg="#555555", co
 # ====================== DỰ ĐOÁN ======================
 def predict(img_idx, true_person):
     img_array = X_test[img_idx]
+
+    # Block-based Gabor (320 chiều)
     features = extract_gabor_features(img_array, gabor_bank)
     features_scaled = scaler.transform([features])
     pred_idx = model.predict(features_scaled)[0]
@@ -142,30 +150,43 @@ def predict(img_idx, true_person):
     preview.image = photo_big
 
 
-# ====================== MINH HỌA GABOR ======================
+# ====================== MINH HỌA GABOR CỤC BỘ ======================
 def show_gabor_process(img_idx):
+    """
+    Hiển thị minh họa Gabor cho phương pháp Block-based.
+    Chỉ lấy ví dụ vùng Mắt Trái (Block 0,0) để hiển thị 8 Response Maps.
+    """
     img = (X_test[img_idx] * 255).astype(np.uint8)
+    h, w = img.shape
+
+    bh, bw = h // 2, w // 2
+
+    # Cắt lấy block [0, 0] (Vùng trán và mắt trái)
+    block_00 = img[0:bh, 0:bw]
 
     # Lấy 8 bộ lọc tiêu biểu (scale 3 - tất cả hướng)
     selected = [f for f in gabor_bank if f['scale'] == 3]
 
     plt.figure(figsize=(14, 8))
-    plt.suptitle("Quá trình Gabor - Ảnh gốc → 8 bản đồ phản hồi (Scale 3)", fontsize=14, fontweight='bold')
+    plt.suptitle("Minh họa Gabor Cục bộ - Phân tích vùng Mắt trái (Block 0,0) - Scale 3", fontsize=14,
+                 fontweight='bold')
 
-    # Ảnh gốc
+    # Ảnh gốc có vẽ khung đỏ bao quanh Block 0,0
     plt.subplot(3, 3, 1)
-    plt.imshow(img, cmap='gray')
-    plt.title("Ảnh gốc", fontsize=11)
+    img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+    cv2.rectangle(img_color, (0, 0), (bw, bh), (255, 0, 0), 1)
+    plt.imshow(img_color)
+    plt.title("Ảnh gốc (Đỏ: Vùng trích xuất)", fontsize=11)
     plt.axis('off')
 
-    # 8 response maps
+    # 8 response maps của riêng block_00
     for i, f in enumerate(selected):
-        filtered = cv2.filter2D(img, cv2.CV_64F, f['kernel'])
+        filtered = cv2.filter2D(block_00, cv2.CV_64F, f['kernel'])
         response = np.abs(filtered)
 
         plt.subplot(3, 3, i + 2)
         plt.imshow(response, cmap='jet')
-        plt.title(f"{f['theta_deg']}°", fontsize=10)
+        plt.title(f"Mắt Trái - Gabor {f['theta_deg']}°", fontsize=10)
         plt.axis('off')
 
     plt.tight_layout()
